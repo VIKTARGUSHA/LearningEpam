@@ -7,6 +7,6 @@ public class DeadLockMain {
         Thread thread1 = new Thread1(invite1, invite2);
         Thread thread2 = new Thread2(invite1, invite2);
         thread1.start();
-        thread1.start();
+        thread2.start();
     }
 }

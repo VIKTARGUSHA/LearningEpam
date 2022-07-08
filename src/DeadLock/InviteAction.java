@@ -8,7 +8,7 @@ public class InviteAction {
     }
 
     public synchronized void invite(InviteAction obj){
-        System.out.println(name + " invites " + name.toUpperCase());
+        System.out.println(name + " invites " + obj.name.toUpperCase());
         obj.action();
     }
     public synchronized void action(){
