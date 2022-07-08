@@ -4,7 +4,8 @@ import java.util.concurrent.TimeUnit;
 
 public class TrainLeft extends Thread{
     public void run(){
-        TimeUnit.MILLISECONDS.timedWait();
-        System.out.println();
+        for (int i = 0; i < 1000; i ++)
+        System.out.println("TrainLeft " + i);
+
     }
 }
