@@ -1,16 +1,37 @@
 package MainTask.Parking;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Parking {
-    Lock lock = new ReentrantLock();
 
+    public static void main(String[] args) {
+        Car car = new Car();
+        for (int i = 0; i < 100; i++) {
 
-    private static int quantityFreePlaces = 15;
-    public void takeOfThePlace(){
-        System.out.println("Some car is looking for a place");
+            new Thread(() -> {
+//for (int i = 0; i < 100; i++){
+                try {
+                    TimeUnit.SECONDS.timedJoin(Thread.currentThread(), (int)(Math.random()*160));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    car.carArriveFreePlaceOne();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
-    }
+            }).start();
 
-}
+            new Thread(() -> {
+                try {
+                    car.carArriveFreePlaceTwo();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+    }}

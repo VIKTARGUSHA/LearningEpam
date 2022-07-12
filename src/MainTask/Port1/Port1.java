@@ -1,14 +1,14 @@
-package MainTask.Port;
+package MainTask.Port1;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class Port {
+public class Port1 {
     private static final int maxPortCapacity = 100;
     private static final int maxShipCapacity = 10;
 
     public static void main(String[] args) throws InterruptedException {
-        BlockingQueue<Integer> blockQueue = new LinkedBlockingQueue<>(Port.maxPortCapacity);
+        BlockingQueue<Integer> blockQueue = new LinkedBlockingQueue<>(Port1.maxPortCapacity);
         int delay = 0;
         for (int k = 0; k < 10; k++) {
             int finalK1 = k;
