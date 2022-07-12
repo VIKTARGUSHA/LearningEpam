@@ -29,7 +29,6 @@ public class Port1 {
                 }
             }).start();
 
-
             if(delay < 1) {
                 Thread.sleep(100);
                 delay++;

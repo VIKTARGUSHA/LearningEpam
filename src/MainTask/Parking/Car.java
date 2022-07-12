@@ -6,45 +6,38 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Car {
-    int quantityFreePlaces = 15;
-    Lock lock = new ReentrantLock(true);
-    Condition condition = lock.newCondition();
-    int carNumber = 0;
+    int carNumber;
+    public Car(){
 
-    public void carArriveFreePlaceOne() throws InterruptedException {
-
-        if (lock.tryLock(10, TimeUnit.SECONDS)) {
-            try {
-                Thread.currentThread().setName(carNumber + "");
-                System.out.println(Thread.currentThread().getName() + " occupied first free place");
-                TimeUnit.SECONDS.timedJoin(Thread.currentThread(), (int) (Math.random() * 9));
-                System.out.println("car " + carNumber++ + " left");
-            } finally {
-                Thread.currentThread().interrupt();
-                lock.unlock();
-            }
-
-        } else System.out.println(Thread.currentThread().getName() + " left to anather parking");
     }
-
-    public void carArriveFreePlaceTwo() throws InterruptedException {
-
-        if (lock.tryLock(10, TimeUnit.SECONDS)) {
-            try {
-                Thread.currentThread().setName(carNumber++ + "");
-                System.out.println(Thread.currentThread().getName() + " occupied second free place");
-                TimeUnit.SECONDS.timedJoin(Thread.currentThread(), (int) (Math.random() * 15));
-                System.out.println("car " + carNumber + " left");
-            } finally {
-
-                Thread.currentThread().interrupt();
-                lock.unlock();
-            }
-        }
+    public Car(int carNumber){
+        this.carNumber = carNumber;
     }
-}
+    Lock lock = new ReentrantLock();
+    public void getLastPlace() throws InterruptedException {
 
+        System.out.println(Thread.currentThread().getName() + " is looking for a place");
+            if(lock.tryLock(5, TimeUnit.SECONDS)) {
+                try {
 
-
-
+                    System.out.println(Thread.currentThread().getName() + " parked in 1 place ");
+                    TimeUnit.SECONDS.timedJoin(Thread.currentThread(), 10);
+                    System.out.println(Thread.currentThread().getName() + " left 1 place");
+                } finally {
+                    lock.unlock();
+                }
+            } else if(lock.tryLock(5, TimeUnit.SECONDS)) {
+                try {
+                    System.out.println(Thread.currentThread().getName() + " parked in 2 place ");
+                    TimeUnit.SECONDS.timedJoin(Thread.currentThread(), 10);
+                    System.out.println(Thread.currentThread().getName() + " left 2 place");
+                }finally {
+                    lock.unlock();
+                }
+            }else {
+                Thread.sleep(10);
+                System.out.println(Thread.currentThread().getName() + " went away");
+            }
+            }
+    }
 
