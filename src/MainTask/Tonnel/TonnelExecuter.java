@@ -14,26 +14,26 @@ public class TonnelExecuter {
     public TonnelExecuter() {
         sdf = new SimpleDateFormat("HH:mm:ss.S");
         CountDownLatch cdw1 = new CountDownLatch(COUNT);
-//        CountDownLatch cdw2 = new CountDownLatch(COUNT);
-//        CountDownLatch cdw3 = new CountDownLatch(COUNT);
-//        CountDownLatch cdw4 = new CountDownLatch(COUNT);
+        CountDownLatch cdw2 = new CountDownLatch(COUNT);
+        CountDownLatch cdw3 = new CountDownLatch(COUNT);
+        CountDownLatch cdw4 = new CountDownLatch(COUNT);
 
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         System.out.println("Launch thread");
 
         executorService.execute(new MyThread(cdw1, "Thread.1"));
-//        executorService.execute(new MyThread(cdw2, "Thread.2"));
-//        executorService.execute(new MyThread(cdw3, "Thread.3"));
-//        executorService.execute(new MyThread(cdw4, "Thread.4"));
+        executorService.execute(new MyThread(cdw2, "Thread.2"));
+        executorService.execute(new MyThread(cdw3, "Thread.3"));
+        executorService.execute(new MyThread(cdw4, "Thread.4"));
 
-//        try {
-//            cdw1.await();
-//            cdw2.await();
-//            cdw3.await();
-//            cdw4.await();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            cdw1.await();
+            cdw2.await();
+            cdw3.await();
+            cdw4.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         executorService.shutdown();
         System.out.println("Thread complete");
     }
@@ -56,7 +56,7 @@ public class TonnelExecuter {
         @Override
         public void run() {
             try {
-                for (int i = 0; i < COUNT-1; i++) {
+                for (int i = 0; i < COUNT; i++) {
                     printMessage(n + " " + i);
                     cdl.countDown();
                     Thread.sleep((int) (Math.random() * 1500));
