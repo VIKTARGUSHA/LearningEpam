@@ -4,23 +4,22 @@ import java.util.concurrent.*;
 
 public class Tonnel {
     CountDownLatch countDownLatch = new CountDownLatch(200);
-    ExecutorService executorServiceTonnel1 = Executors.newSingleThreadExecutor();
-    ExecutorService executorServiceTonnel2 = Executors.newSingleThreadExecutor();
+    ExecutorService executorServiceTonnel1 = Executors.newFixedThreadPool(100);
+    ExecutorService executorServiceTonnel2 = Executors.newFixedThreadPool(100);
     volatile int tonnel1FirstDirectionTrainNumber = 0;
     volatile int tonnel1SecondDirectionTrainNumber = 0;
     volatile int tonnel2FirstDirectionTrainNumber = 0;
     volatile int tonnel2SecondDirectionTrainNumber = 0;
 
-    Tonnel() throws BrokenBarrierException, InterruptedException, ExecutionException {
+    Tonnel() throws InterruptedException {
         ExecutorService executorService1 = Executors.newFixedThreadPool(100);
-
+Callable<String> t1 = new TrainTonnel1FirstSecondDirection();
+Callable<String> t2 = new TrainTonnel2FirstSecondDirection();
         for (int i = 0; i < 50; i++) {
-            //   Thread.sleep(100);
-            // System.out.println("---------------------------------------");
-            executorService1.submit(new TrainTonnel1FirstDirection());
-            //      executorService1.submit(new TrainTonnel1SecondDirection());
-            executorService1.submit(new TrainTonnel2FirstDirection());
-            //  executorService1.submit(new TrainTonnel2SecondDirection());
+
+            executorService1.submit(t1);
+            executorService1.submit(t2);
+
         }
 
         countDownLatch.await();
@@ -31,54 +30,32 @@ public class Tonnel {
         executorServiceTonnel2.shutdown();
     }
 
-    class TrainTonnel1FirstDirection implements Callable<String> {
+    class TrainTonnel1FirstSecondDirection implements Callable<String> {
         @Override
-        public synchronized String call() throws ExecutionException, InterruptedException {
-            executorServiceTonnel1.submit(new TrainTonnel2Direction());
-
-            executorServiceTonnel1.submit(new TrainTonnel1Direction());
+        public synchronized String call() throws InterruptedException {
+            executorServiceTonnel1.submit(new TrainTonnel1DirectionS());
+            executorServiceTonnel1.submit(new TrainTonnel1DirectionF());
+         Thread.sleep(1000);
+            return "";
         }
-
-    class TrainTonnel1Direction implements Callable<String> {
+    }
+    class TrainTonnel1DirectionF implements Callable<String> {
         @Override
-        public synchronized String call() throws ExecutionException, InterruptedException {
+        public  String call() throws ExecutionException, InterruptedException {
             System.out.println("Train " + tonnel1SecondDirectionTrainNumber + executorServiceTonnel1
                     .submit(new TrainTonnel1SecondDirectionLounch()).get());
-         //   try {
-                System.out.println("Train " + tonnel1FirstDirectionTrainNumber + executorServiceTonnel1
-                        .submit(new TrainTonnel1FirstDirectionLounch()).get());
-          /*  } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (TimeoutException e) {
-                try {
-                    System.out.println("Train " + tonnel1SecondDirectionTrainNumber + executorServiceTonnel1
-                            .submit(new TrainTonnel1SecondDirectionLounch()).get() + " (this train was redirected)");
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-                } catch (ExecutionException executionException) {
-                    executionException.printStackTrace();
-                }
-            }
-*/
 
-    //        try {
-         /*5, TimeUnit.SECONDS));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (TimeoutException e) {
-                try {
-                    System.out.println("Train " + tonnel1FirstDirectionTrainNumber + executorServiceTonnel1
-                            .submit(new TrainTonnel1FirstDirectionLounch()).get() + " (this train was redirected)");
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-                } catch (ExecutionException executionException) {
-                    executionException.printStackTrace();
-                }
-            */
+            return " ";
+        }
+    }
+    class TrainTonnel1DirectionS implements Callable<String> {
+        @Override
+        public  String call() throws ExecutionException, InterruptedException {
+
+
+            System.out.println("Train " + tonnel1FirstDirectionTrainNumber + executorServiceTonnel1
+                    .submit(new TrainTonnel1FirstDirectionLounch()).get());
+
             return " ";
         }
     }
@@ -94,73 +71,51 @@ public class Tonnel {
             return "Train went through Tonnel 1 first direction";
         }
     }
-
-    //    class TrainTonnel1SecondDirection implements Callable<String> {
-//        @Override
-//        public String call() throws Exception {
-//            for (int i = 0; i < 100; i++) {
-//
-//                System.out.println("Train " + i + executorServiceTonnel1.submit(new TrainTonnel1SecondDirectionLounch()).get());
-//
-//            }
-//            return Thread.currentThread().getName() + "Train went through Tonnel 1 second direction";
-//        }
-//    }
     class TrainTonnel1SecondDirectionLounch implements Callable<String> {
         @Override
         public String call() throws Exception {
             System.out.println("Train " + tonnel1SecondDirectionTrainNumber++ + " start moving to 1 tonnel second direction");
             countDownLatch.countDown();
-        //    Thread.sleep(50);
+
             return "Train went through Tonnel 1 second direction";
         }
     }
 
 
 
-    class TrainTonnel2Direction implements Callable<String> {
+
+
+    class TrainTonnel2FirstSecondDirection implements Callable<String> {
         @Override
         public synchronized String call() throws ExecutionException, InterruptedException {
+            executorServiceTonnel2.submit(new TrainTonnel2DirectionS());
+            executorServiceTonnel2.submit(new TrainTonnel2DirectionF());
+     TimeUnit.SECONDS.timedJoin(Thread.currentThread(), 1);
+            return "";
+        }
+    }
+    class TrainTonnel2DirectionS implements Callable<String> {
+        @Override
+        public String call() throws ExecutionException, InterruptedException {
             System.out.println("Train " + tonnel2SecondDirectionTrainNumber + executorServiceTonnel2
                     .submit(new TrainTonnel2SecondDirectionLounch()).get());
-    //        try {
-                System.out.println("Train " + tonnel2FirstDirectionTrainNumber + executorServiceTonnel2
-                        .submit(new TrainTonnel2FirstDirectionLounch()).get());/*5, TimeUnit.SECONDS));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (TimeoutException e) {
-                try {
-                    System.out.println("Train " + tonnel2SecondDirectionTrainNumber + executorServiceTonnel2
-                            .submit(new TrainTonnel2SecondDirectionLounch()).get() + " (this train was redirected)");
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-                } catch (ExecutionException executionException) {
-                    executionException.printStackTrace();
-                }
-            }
-            */
-      //      try {
-             /*5, TimeUnit.SECONDS));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (TimeoutException e) {
-                try {
-                    System.out.println("Train " + tonnel1SecondDirectionTrainNumber + executorServiceTonnel2
-                            .submit(new TrainTonnel2FirstDirectionLounch()).get() + " (this train was redirected)");
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-                } catch (ExecutionException executionException) {
-                    executionException.printStackTrace();
-                }
-            }
-*/
+
+
             return " ";
         }
     }
+    class TrainTonnel2DirectionF implements Callable<String> {
+        @Override
+        public String call() throws ExecutionException, InterruptedException {
+            System.out.println("Train " + tonnel2FirstDirectionTrainNumber + executorServiceTonnel2
+                    .submit(new TrainTonnel1SecondDirectionLounch()).get());
+
+
+            return " ";
+        }
+    }
+
+
 
     class TrainTonnel2FirstDirectionLounch implements Callable<String> {
         @Override
@@ -171,18 +126,6 @@ public class Tonnel {
             return "Train went through Tonnel 2 first direction";
         }
     }
-
-    //    class TrainTonnel2SecondDirection implements Callable<String> {
-//        @Override
-//        public String call() throws Exception {
-//            for (int i = 0; i < 100; i++) {
-//
-//                System.out.println("Train " + i + executorServiceTonnel2.submit(new TrainTonnel2SecondDirectionLounch()).get());
-//
-//            }
-//            return Thread.currentThread().getName() + "Train went through Tonnel 2 second direction";
-//        }
-//    }
     class TrainTonnel2SecondDirectionLounch implements Callable<String> {
         @Override
         public String call() throws Exception {
