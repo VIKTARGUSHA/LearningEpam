@@ -40,14 +40,18 @@ public class Tonnel {
 
         @Override
         public String call() throws ExecutionException, InterruptedException {
-            if(lock.tryLock(7, TimeUnit.SECONDS)) {
+            if(lock.tryLock(20, TimeUnit.SECONDS)) {
                 executorServiceTonnel1.submit(new TrainTonnel1Direction());
                 Thread.sleep(500);
+                lock.unlock();
             }else {
-                executorServiceTonnel2.submit(new TrainTonnel1Direction());
+                lock.lock();
+                System.out.println("These trains were redirected to tonnel 2");
+                executorServiceTonnel2.submit(new TrainTonnel2Direction());
                 Thread.sleep(500);
+                lock.unlock();
             }
-            lock.unlock();
+
             return "";
 
         }
@@ -93,12 +97,16 @@ public class Tonnel {
         Lock lock  =new ReentrantLock();
         @Override
         public String call() throws ExecutionException, InterruptedException {
-            if (lock.tryLock(7, TimeUnit.SECONDS)) {
+            if (lock.tryLock(20, TimeUnit.SECONDS)) {
                 executorServiceTonnel2.submit(new TrainTonnel2Direction());
                 TimeUnit.MILLISECONDS.timedJoin(Thread.currentThread(), 500);
+                lock.unlock();
             }else {
+                lock.lock();
+                System.out.println("These trains were redirected to tonnel 1");
                 executorServiceTonnel1.submit(new TrainTonnel1Direction());
                 TimeUnit.MILLISECONDS.timedJoin(Thread.currentThread(), 500);
+                lock.unlock();
             }
             lock.unlock();
             return "";
