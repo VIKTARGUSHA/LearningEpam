@@ -9,7 +9,11 @@ public class TrainTonnel2SecondDirection extends Thread {
     }
 
     public void run() {
-        tonnel.trainGoesThroughTonnelTwo(directionNumber);
+        try {
+            tonnel.trainGoesThroughTonnelTwo(directionNumber);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
 
