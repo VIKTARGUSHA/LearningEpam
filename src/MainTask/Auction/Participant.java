@@ -7,12 +7,13 @@ import java.util.concurrent.CyclicBarrier;
 
 public class Participant implements Runnable, Callable<String> {
     NamePlate namePlate;
-    static int currentGeneralBet = 0;
+    static volatile int currentGeneralBet = 0;
     int thisBet;
     public static String nameLastParticipant;
     public String name;
     Boolean b = true;
     int counterGaps = 0;
+    static Boolean interapter = true;
 
     public Participant(String name, CyclicBarrier c, NamePlate namePlate, Boolean b) {
         this.name = name;
@@ -40,36 +41,39 @@ public class Participant implements Runnable, Callable<String> {
                 thisBet = currentGeneralBet;
                 if (j == 2) {
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(200);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             }
 
-            if (thisBet == Participant.currentGeneralBet) {
-                System.out.println(nameLastParticipant + " have to pay for the lot " + thisBet);
+            if (thisBet == Participant.currentGeneralBet && Participant.nameLastParticipant.equals(name)) {
+                System.out.println(name + " have to pay for the lot " + thisBet);
+//
 //                try {
-//                    Thread.sleep(5000);
+//                    Thread.sleep((int)(Math.random()*7000));
 //                } catch (InterruptedException e) {
 //                    e.printStackTrace();
-                try {
-                    this.wait(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+//                }
+
+                if(Participant.interapter) {
+                    b = false;
+                    System.out.println(nameLastParticipant + " doesn't pay on time for this lot");
+                    Auktion.indicatorPaying = false;
                 }
-                b = false;
-                System.out.println(nameLastParticipant + " doesn't pay on time for this lot");
+                Participant.interapter = true;
             }
-        }else {
+        } else {
             System.out.println("Participant " + name + " is missing this lot");
 
-            if (counterGaps++ == 2){
+            if (counterGaps++ < 2) {
                 b = true;
                 counterGaps = 0;
             }
         }
     }
+
     public static synchronized void makeBet() throws BrokenBarrierException, InterruptedException {
         int add = (int) (Math.random() * 100);
         currentGeneralBet += add;
