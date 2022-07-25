@@ -14,6 +14,7 @@ public class Participant implements Runnable, Callable<String> {
     Boolean b = true;
     int counterGaps = 0;
     static Boolean interapter = true;
+    public static boolean lotTime;
 
     public Participant(String name, CyclicBarrier c, NamePlate namePlate, Boolean b) {
         this.name = name;
@@ -23,6 +24,8 @@ public class Participant implements Runnable, Callable<String> {
 
     @Override
     public synchronized void run() {
+        Participant.interapter = true;
+        lotTime = false;
         if (b) {
             for (int j = 0; j < 3; j++) {
                 try {
@@ -50,24 +53,29 @@ public class Participant implements Runnable, Callable<String> {
 
             if (thisBet == Participant.currentGeneralBet && Participant.nameLastParticipant.equals(name)) {
                 System.out.println(name + " have to pay for the lot " + thisBet);
-//
-//                try {
-//                    Thread.sleep((int)(Math.random()*7000));
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
+
+                try {
+                    //Thread.sleep((int)(Math.random()*7000));
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
                 if(Participant.interapter) {
-                    b = false;
-                    System.out.println(nameLastParticipant + " doesn't pay on time for this lot");
+                    System.out.println(nameLastParticipant + " paid for lot " + Auktion.lotNumber + " " + currentGeneralBet);
                     Auktion.indicatorPaying = false;
+                    lotTime = true;
+                }else {
+                    b = false;
+                    lotTime = true;
                 }
-                Participant.interapter = true;
+
             }
+
         } else {
             System.out.println("Participant " + name + " is missing this lot");
-
-            if (counterGaps++ < 2) {
+            counterGaps++;
+            if (counterGaps == 2) {
                 b = true;
                 counterGaps = 0;
             }

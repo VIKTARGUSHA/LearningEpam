@@ -4,8 +4,8 @@ import java.util.concurrent.*;
 
 public class Auktion {
 
-public static boolean indicatorPaying = true;
-
+    public static boolean indicatorPaying = true;
+    static int lotNumber;
     public static void main(String[] args) throws InterruptedException {
         CyclicBarrier cyclicBarrier = new CyclicBarrier(15);
         NamePlate namePlate = new NamePlate();
@@ -20,6 +20,7 @@ public static boolean indicatorPaying = true;
         int numberOfLots = 5;
         for (int i = 0; i < numberOfLots; i++) {
             Auktion.indicatorPaying = true;
+            lotNumber = i;
             System.out.println("-----------------------------------------------------------");
             Future<String> future1 = participantLot.submit((Callable<String>) jonh);
             Future<String> future2 = participantLot.submit((Callable<String>) rosa);
@@ -29,15 +30,19 @@ public static boolean indicatorPaying = true;
 
             Thread.sleep(3000);
 
-            Participant.interapter = false;
+                Participant.interapter = false;
 
-            if(Auktion.indicatorPaying) {
-                System.out.println("Participant " + Participant.nameLastParticipant + " make max bet and won this lot: "
-                        + i + " for: " + Participant.currentGeneralBet);
+            if (Auktion.indicatorPaying) {
+                System.out.println("Participant " + Participant.nameLastParticipant + " doesn't pay for lot " + i + " on time");
+//                System.out.println("Participant " + Participant.nameLastParticipant + " make max bet and won this lot: "
+//                        + i + " for: " + Participant.currentGeneralBet);
             }
             Participant.currentGeneralBet = 0;
-
+            while (!Participant.lotTime){
+Thread.sleep(100);
+            }
         }
         participantLot.shutdown();
+
     }
 }
