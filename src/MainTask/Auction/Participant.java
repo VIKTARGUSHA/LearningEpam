@@ -55,8 +55,8 @@ public class Participant implements Runnable, Callable<String> {
                 System.out.println(name + " have to pay for the lot " + thisBet);
 
                 try {
-                    //Thread.sleep((int)(Math.random()*7000));
-                    Thread.sleep(5000);
+                    Thread.sleep((int)(Math.random()*3000));
+                  //  Thread.sleep(3000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
